@@ -204,12 +204,12 @@ module shape_processor_props(
 
   sfr_constant_if_illegal_combination_write_of_keep_shape: assert property (
       write && shape_on_write_bus == KEEP_SHAPE
-          && !is_legal_combination(shape_e'(shape_on_write_bus),operation_e'(operation_on_write_bus)) |=>
+          && !is_legal_combination(shape_e'(shape_in_sfr),operation_e'(operation_on_write_bus)) |=>
               $stable(shape_processor.ctrl_sfr));
 
   sfr_constant_if_illegal_combination_write_of_keep_operation: assert property (
       write && operation_on_write_bus == KEEP_OPERATION
-          && !is_legal_combination(shape_e'(shape_on_write_bus),operation_e'(operation_on_write_bus)) |=>
+          && !is_legal_combination(shape_e'(shape_on_write_bus),operation_e'(operation_in_sfr)) |=>
               $stable(shape_processor.ctrl_sfr));
 
   //------------------------------------------------------------------------------------------------
@@ -231,9 +231,9 @@ module shape_processor_props(
 
   function bit is_legal_ctrl_write_data_combination();
     if (shape_on_write_bus == KEEP_SHAPE)
-      return is_legal_combination(shape_e'(shape_on_write_bus),operation_e'(operation_on_write_bus));
+      return is_legal_combination(shape_e'(shape_in_sfr),operation_e'(operation_on_write_bus));
     if (operation_on_write_bus == KEEP_OPERATION)
-      return is_legal_combination(shape_e'(shape_on_write_bus),operation_e'(operation_on_write_bus));
+      return is_legal_combination(shape_e'(shape_on_write_bus),operation_e'(operation_in_sfr));
     return is_legal_combination(shape_e'(shape_on_write_bus),operation_e'(operation_on_write_bus));
   endfunction
 
