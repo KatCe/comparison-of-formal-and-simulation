@@ -135,8 +135,11 @@ module shape_processor_props(
   ctrl_sfr_reg write_data_as_ctrl_sfr;
   assign write_data_as_ctrl_sfr = write_data;
 
-  let shape_on_write_bus = write_data_as_ctrl_sfr.SHAPE;
-  let operation_on_write_bus = write_data_as_ctrl_sfr.OPERATION;
+  bit [2:0] shape_on_write_bus;
+  bit [6:0] operation_on_write_bus;
+
+  assign shape_on_write_bus = write_data_as_ctrl_sfr.SHAPE;
+  assign operation_on_write_bus = write_data_as_ctrl_sfr.OPERATION;
 
 
   //------------------------------------------------------------------------------------------------
@@ -189,7 +192,7 @@ module shape_processor_props(
 
   sfr_constant_if_illegal_combination_write_of_proper_modes: assert property (
       write && shape_on_write_bus != KEEP_SHAPE && operation_on_write_bus != KEEP_OPERATION
-          && !is_legal_combination(shape_on_write_bus, operation_on_write_bus) |=>
+          && !is_legal_combination(shape_e'(shape_on_write_bus),operation_e'(operation_on_write_bus)) |=>
               $stable(shape_processor.ctrl_sfr));
 
   //------------------------------------------------------------------------------------------------
@@ -201,12 +204,12 @@ module shape_processor_props(
 
   sfr_constant_if_illegal_combination_write_of_keep_shape: assert property (
       write && shape_on_write_bus == KEEP_SHAPE
-          && !is_legal_combination(shape_in_sfr, operation_on_write_bus) |=>
+          && !is_legal_combination(shape_e'(shape_on_write_bus),operation_e'(operation_on_write_bus)) |=>
               $stable(shape_processor.ctrl_sfr));
 
   sfr_constant_if_illegal_combination_write_of_keep_operation: assert property (
       write && operation_on_write_bus == KEEP_OPERATION
-          && !is_legal_combination(shape_on_write_bus, operation_in_sfr) |=>
+          && !is_legal_combination(shape_e'(shape_on_write_bus),operation_e'(operation_on_write_bus)) |=>
               $stable(shape_processor.ctrl_sfr));
 
   //------------------------------------------------------------------------------------------------
@@ -228,10 +231,10 @@ module shape_processor_props(
 
   function bit is_legal_ctrl_write_data_combination();
     if (shape_on_write_bus == KEEP_SHAPE)
-      return is_legal_combination(shape_in_sfr, operation_on_write_bus);
+      return is_legal_combination(shape_e'(shape_on_write_bus),operation_e'(operation_on_write_bus));
     if (operation_on_write_bus == KEEP_OPERATION)
-      return is_legal_combination(shape_on_write_bus, operation_in_sfr);
-    return is_legal_combination(shape_on_write_bus, operation_on_write_bus);
+      return is_legal_combination(shape_e'(shape_on_write_bus),operation_e'(operation_on_write_bus));
+    return is_legal_combination(shape_e'(shape_on_write_bus),operation_e'(operation_on_write_bus));
   endfunction
 
 
